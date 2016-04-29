@@ -85,9 +85,9 @@ function waitWhile<T>(nav: NavController, p: Promise<T>): Promise<T> {
 }
 
 @Page({
-    templateUrl: 'build/pages/hello-ionic/hello-ionic.html'
+    templateUrl: 'build/pages/taskacquisition/taskacquisition.html'
 })
-export class HelloIonicPage {
+export class TaskAcquisitionPage {
 
     public task:Task;
     public savedTasks: Task[] = [];

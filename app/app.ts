@@ -1,7 +1,7 @@
 import {App, IonicApp, Platform, MenuController} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
-import {HelloIonicPage} from './pages/hello-ionic/hello-ionic';
-import {ListPage} from './pages/list/list';
+import {TaskAcquisitionPage} from './pages/taskacquisition/taskacquisition';
+import {RekoPage} from './pages/reko/reko';
 
 
 @App({
@@ -10,7 +10,7 @@ import {ListPage} from './pages/list/list';
 })
 class MyApp {
   // make HelloIonicPage the root (or first) page
-  rootPage: any = HelloIonicPage;
+  rootPage: any = TaskAcquisitionPage;
   pages: Array<{title: string, component: any}>;
 
   constructor(
@@ -22,8 +22,8 @@ class MyApp {
 
     // set our app's pages
     this.pages = [
-      { title: 'Hello Ionic', component: HelloIonicPage },
-      { title: 'My First List', component: ListPage }
+      { title: 'Störungserfassung', component: TaskAcquisitionPage },
+      { title: 'Reko', component: RekoPage }
     ];
   }
 
