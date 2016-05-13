@@ -1,0 +1,6 @@
+.task__onBeforeSwipe {
+  ion-card {
+    transform: perspective(600px) rotateX(45deg);
+    transition-duration: 200ms;
+  }
+}
