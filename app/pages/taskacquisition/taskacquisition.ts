@@ -1,6 +1,7 @@
 import {Page, Alert, NavController, Loading} from 'ionic-angular';
 import {ImagePicker} from 'ionic-native';
 import {Camera} from 'ionic-native';
+import TaskComponent from '../../components/task/Task';
 
 const createTaskUrl = 'http://172.24.59.212:8123/tasks/tasks';
 
@@ -85,7 +86,8 @@ function waitWhile<T>(nav: NavController, p: Promise<T>): Promise<T> {
 }
 
 @Page({
-    templateUrl: 'build/pages/taskacquisition/taskacquisition.html'
+    templateUrl: 'build/pages/taskacquisition/taskacquisition.html',
+    directives: [TaskComponent]
 })
 export class TaskAcquisitionPage {
 

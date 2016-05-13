@@ -1,0 +1,22 @@
+<ion-card (touch)="onTaskTouched(task)">
+    <img [src]="value.getFrontImage().toResourceUrl()">
+    <ion-card-content>
+        <ion-card-title>{{value.title}}</ion-card-title>
+        <p>{{value.getFrontImage().description}}</p>
+    </ion-card-content>
+
+    <ion-row no-padding>
+        <ion-col>
+            <button clear small danger (click)="deleteTask()">
+                <ion-icon name='trash'></ion-icon>
+                Löschen
+            </button>
+        </ion-col>
+        <ion-col text-right>
+            <button clear small primary (click)="submitTask()">
+                <ion-icon name='cloud-upload'></ion-icon>
+                Übertragen
+            </button>
+        </ion-col>
+    </ion-row>
+</ion-card>
