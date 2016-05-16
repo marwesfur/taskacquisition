@@ -2,16 +2,17 @@ import {App, IonicApp, Platform, MenuController} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {TaskAcquisitionPage} from './pages/taskacquisition/taskacquisition';
 import {RekoPage} from './pages/reko/reko';
-
+import {SwipeTarget, SwipeController} from './components/swipetarget/SwipeTarget'
 
 @App({
   templateUrl: 'build/app.html',
+  directives: [SwipeTarget],
+  providers: [SwipeController],
   config: {} // http://ionicframework.com/docs/v2/api/config/Config/
 })
 class MyApp {
-  // make HelloIonicPage the root (or first) page
   rootPage: any = TaskAcquisitionPage;
-  pages: Array<{title: string, component: any}>;
+  pages: Array<{title: string; component: any}>;
 
   constructor(
     private app: IonicApp,
