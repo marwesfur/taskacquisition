@@ -1,6 +1,22 @@
+task {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* Internet Explorer/Edge */
+  user-select: none;
+}
+
 .task__onBeforeSwipe {
   ion-card {
     transform: perspective(600px) rotateX(45deg);
     transition-duration: 200ms;
+  }
+}
+
+.task__onSwiped {
+  ion-card {
+    transform: translate3d(0, -1000px, 200px);
+    transition-duration: 500ms;
   }
 }

@@ -1,28 +1,41 @@
-import {Component, forwardRef, Directive, Host, EventEmitter, ElementRef, NgZone, Input, Output, Renderer, ChangeDetectionStrategy, ViewEncapsulation} from 'angular2/core';
+import {Component, forwardRef, Directive, Host, EventEmitter, ElementRef, NgZone, Input, Output, Renderer, ChangeDetectionStrategy, ViewEncapsulation, OnInit, OnDestroy} from 'angular2/core';
 
-import {Ion} from 'ionic-angular';
-import {SlideGesture} from "ionic-angular/gestures/slide-gesture";
-import {SlideData} from "ionic-angular/gestures/slide-gesture";
 
-class SwipeToGiveGesture extends SlideGesture {
+import {Gesture} from 'ionic-angular/gestures/gesture'
+import {SwipeController} from '../swipetarget/SwipeTarget'
+declare var Hammer: any;
 
-    constructor(private ele: HTMLElement) {
-        super(ele, { direction: 'x' });
-    }
+class SwipeToGiveGesture {
 
-    // Set CSS, then wait one frame for it to apply before sliding starts
-    onSlideBeforeStart(slide: SlideData, ev: any) {
-        console.debug('SwipeToGiveGesture, onSlideBeforeStart');
+    constructor(private ele: HTMLElement, swipedOut) {
 
-        this.ele.classList.add('task__onBeforeSwipe');
-    }
+        var pan = new Hammer.Pan({direction: Hammer.DIRECTION_UP, threshold: 0}),
+            swipe = new Hammer.Swipe({direction: Hammer.DIRECTION_UP, velocity: 0.05, threshold: 100});
 
-    onSlideEnd(slide?: SlideData, ev?: any): void {
-        console.debug('SwipeToGiveGesture, onSlideBeforeStart');
+        var mc = new Hammer.Manager(ele);
 
-        this.ele.classList.remove('task__onBeforeSwipe');
-    }
+        mc.add(pan);
+        mc.add(swipe).recognizeWith(pan);
 
+        mc.on('swipeup', e => {
+            console.log('swipeup');
+
+            this.ele.classList.add('task__onSwiped');
+            setTimeout(swipedOut, 500);
+        })
+
+        mc.on('panstart', e => {
+            console.debug('SwipeToGiveGesture, onSlideBeforeStart');
+
+            this.ele.classList.add('task__onBeforeSwipe');
+        })
+
+        mc.on('panend', e => {
+            console.debug('SwipeToGiveGesture, onSlideEnd');
+
+            this.ele.classList.remove('task__onBeforeSwipe');
+        })
+     }
 }
 
 @Component({
@@ -36,17 +49,16 @@ export default class TaskComponent {
     @Output() delete = new EventEmitter<void>();
     @Output() submit = new EventEmitter<void>();
 
-    constructor(private el:ElementRef) {
-
+    constructor(private el:ElementRef, private swipeCtrl: SwipeController) {
     }
 
     ngOnInit() {
-        this._gesture = new SwipeToGiveGesture(this.el.nativeElement);
-        this._gesture.listen();
+        this._gesture = new SwipeToGiveGesture(this.el.nativeElement, () => this.deleteTask());
     }
 
     deleteTask() {
         this.delete.emit(undefined);
+        this.swipeCtrl.open();
     }
 
     submitTask() {
