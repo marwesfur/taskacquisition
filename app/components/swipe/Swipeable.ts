@@ -1,5 +1,6 @@
 import {Component, forwardRef, Directive, Host, EventEmitter, ElementRef, NgZone, Input, Output, Renderer, ChangeDetectionStrategy, ViewEncapsulation, OnInit, OnDestroy} from 'angular2/core';
 import {Gesture} from 'ionic-angular/gestures/gesture'
+import {Animation} from 'ionic-angular/animations/animation'
 declare var Hammer: any;
 
 import {SwipeController} from './SwipeController'
@@ -20,7 +21,8 @@ class SwipeGesture {
         if (this._hammer)
             return;
 
-        let mc = this._hammer = new Hammer.Manager(this.ele);
+        let ele = this.ele;
+        let mc = this._hammer = new Hammer.Manager(ele);
 
         mc.add(pan);
         mc.add(press).recognizeWith(pan);
@@ -30,7 +32,7 @@ class SwipeGesture {
         mc.on('swipeup', e => {
             this.ele.classList.add('swipeable__onBeforeSwipe');
             this.ele.classList.add('swipeable__onSwiped');
-            setTimeout(this.swipedOut, 400);
+            //setTimeout(this.swipedOut, 400);
         });
 
         mc.on('press', e => {
@@ -42,11 +44,20 @@ class SwipeGesture {
         });
 
         mc.on('panstart', e => {
-            //this.ele.classList.add('swipeable__onBeforeSwipe');
+            this.ele.classList.add('swipeable__onBeforeSwipe');
         });
 
         mc.on('panend', e => {
-            //this.ele.classList.remove('swipeable__onBeforeSwipe');
+            this.ele.classList.remove('swipeable__onBeforeSwipe');
+        });
+
+        mc.on('panmove', e => {
+            let ani = new Animation(ele);
+            ani
+                .duration(0)
+                .fromTo('translateY', '0', e.deltaY + 'px')
+                .fromTo('translateX', '0', e.deltaX + 'px')
+                .play();
         });
     }
 
