@@ -1,0 +1,28 @@
+swipe-target {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: auto;
+  left: 0;
+
+  height: 100px;
+
+  transform: translate3d(0, -9999px, 0);
+
+  z-index: 99;
+}
+
+swipeable {
+  display: block;
+}
+
+.swipeable__onBeforeSwipe {
+  transform: perspective(600px) rotateX(45deg);
+  transition-duration: 200ms;
+}
+
+.swipeable__onSwiped {
+  transform: translate3d(0, -1000px, 200px);
+  transition-duration: 500ms;
+}
+
