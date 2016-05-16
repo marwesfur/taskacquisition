@@ -4,22 +4,29 @@ declare var Hammer: any;
 
 import {SwipeController} from './SwipeController'
 
+const pan = new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: 0}),
+      swipe = new Hammer.Swipe({direction: Hammer.DIRECTION_UP, velocity: 0.05, threshold: 100});
+
 
 class SwipeGesture {
 
-    constructor(private ele: HTMLElement, swipedOut) {
+    private _hammer;
 
-        var pan = new Hammer.Pan({direction: Hammer.DIRECTION_UP, threshold: 0}),
-            swipe = new Hammer.Swipe({direction: Hammer.DIRECTION_UP, velocity: 0.05, threshold: 100});
+    constructor(private ele: HTMLElement, private swipedOut) {
+    }
 
-        var mc = new Hammer.Manager(ele);
+    public listen() {
+        if (this._hammer)
+            return;
+
+        let mc = this._hammer = new Hammer.Manager(this.ele);
 
         mc.add(pan);
         mc.add(swipe).recognizeWith(pan);
 
         mc.on('swipeup', e => {
             this.ele.classList.add('swipeable__onSwiped');
-            setTimeout(swipedOut, 500);
+            setTimeout(this.swipedOut, 400);
         });
 
         mc.on('panstart', e => {
@@ -29,6 +36,14 @@ class SwipeGesture {
         mc.on('panend', e => {
             this.ele.classList.remove('swipeable__onBeforeSwipe');
         });
+    }
+
+    public unlisten() {
+        if (!this._hammer)
+            return;
+
+        this._hammer.destroy();
+        this._hammer = null;
     }
 }
 
@@ -42,19 +57,23 @@ export class Swipeable {
     @Output() swiped = new EventEmitter<void>();
 
     constructor(private el: ElementRef, private ctrl: SwipeController) {
+        this._gesture = new SwipeGesture(this.el.nativeElement, () => this.swiped.emit(null));
         ctrl.availabilityChanged.subscribe(availabilityInfo => this.updateAvailability(availabilityInfo));
     }
 
     ngOnInit() {
-        this._gesture = new SwipeGesture(this.el.nativeElement, () => this.swiped.emit(undefined));
         this.updateAvailability(this.ctrl.getAvailabilityInfo());
     }
 
     public updateAvailability(availabilityInfo) {
         let ele = this.el.nativeElement;
-        if (availabilityInfo.available)
+
+        if (availabilityInfo.available) {
+            this._gesture.listen();
             ele.classList.add('swipeable__available');
-        else
+        } else {
+            this._gesture.unlisten();
             ele.classList.remove('swipeable__available');
+        }
     }
 }
