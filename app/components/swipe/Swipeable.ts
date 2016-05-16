@@ -4,7 +4,8 @@ declare var Hammer: any;
 
 import {SwipeController} from './SwipeController'
 
-const pan = new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: 0}),
+const pan = new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: 9}),
+      press = new Hammer.Press({time: 0, threshold: 100}),
       swipe = new Hammer.Swipe({direction: Hammer.DIRECTION_UP, velocity: 0.05, threshold: 100});
 
 
@@ -22,19 +23,30 @@ class SwipeGesture {
         let mc = this._hammer = new Hammer.Manager(this.ele);
 
         mc.add(pan);
-        mc.add(swipe).recognizeWith(pan);
+        mc.add(press).recognizeWith(pan);
+        mc.add(swipe).recognizeWith(pan).recognizeWith(press);
+
 
         mc.on('swipeup', e => {
+            this.ele.classList.add('swipeable__onBeforeSwipe');
             this.ele.classList.add('swipeable__onSwiped');
             setTimeout(this.swipedOut, 400);
         });
 
-        mc.on('panstart', e => {
+        mc.on('press', e => {
             this.ele.classList.add('swipeable__onBeforeSwipe');
         });
 
-        mc.on('panend', e => {
+        mc.on('pressup', e => {
             this.ele.classList.remove('swipeable__onBeforeSwipe');
+        });
+
+        mc.on('panstart', e => {
+            //this.ele.classList.add('swipeable__onBeforeSwipe');
+        });
+
+        mc.on('panend', e => {
+            //this.ele.classList.remove('swipeable__onBeforeSwipe');
         });
     }
 

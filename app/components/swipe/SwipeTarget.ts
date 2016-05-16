@@ -19,7 +19,7 @@ export class SwipeTarget {
         this.ani = new Animation();
         this.ani
             .easing('ease')
-            .duration(500);
+            .duration(250);
     }
 
     ngOnInit() {
