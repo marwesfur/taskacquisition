@@ -23,6 +23,24 @@ swipeable {
 
 .swipeable__onSwiped {
   transform: translate3d(0, -1000px, 200px);
-  transition-duration: 500ms;
+  transition-duration: 1000ms;
 }
 
+.swipeable__available {
+  animation-name: glow;
+  animation-duration: 2000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 60px 0px rgba(108, 183, 241, 1);
+  }
+  50% {
+    box-shadow: 0 0 0px 0px rgba(108, 183, 241, 1);
+  }
+  100% {
+    box-shadow: 0 0 60px 0px rgba(108, 183, 241, 1);
+  }
+}

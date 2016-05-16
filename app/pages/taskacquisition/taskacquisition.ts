@@ -1,7 +1,10 @@
 import {Page, Alert, NavController, Loading} from 'ionic-angular';
 import {ImagePicker} from 'ionic-native';
 import {Camera} from 'ionic-native';
+
 import TaskComponent from '../../components/task/Task';
+import {SwipeController} from '../../components/swipe/SwipeController'
+
 
 const createTaskUrl = 'http://172.24.59.212:8123/tasks/tasks';
 
@@ -94,8 +97,12 @@ export class TaskAcquisitionPage {
     public task:Task;
     public savedTasks: Task[] = [];
 
-    constructor(public nav: NavController) {
+    constructor(public nav: NavController, private swipeCtrl: SwipeController) {
         this.newTask();
+    }
+
+    public toggleSwipeAvailability() {
+        this.swipeCtrl.toggleAvailability();
     }
 
     public newTask() {

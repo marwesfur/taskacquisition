@@ -2,7 +2,8 @@ import {App, IonicApp, Platform, MenuController} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {TaskAcquisitionPage} from './pages/taskacquisition/taskacquisition';
 import {RekoPage} from './pages/reko/reko';
-import {SwipeTarget, SwipeController} from './components/swipe/SwipeTarget'
+import {SwipeTarget} from './components/swipe/SwipeTarget'
+import {SwipeController} from './components/swipe/SwipeController'
 
 @App({
   templateUrl: 'build/app.html',

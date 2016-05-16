@@ -1,9 +1,11 @@
 import {Component, forwardRef, Directive, Host, EventEmitter, ElementRef, NgZone, Input, Output, Renderer, ChangeDetectionStrategy, ViewEncapsulation, OnInit, OnDestroy} from 'angular2/core';
-
 import {Gesture} from 'ionic-angular/gestures/gesture'
 declare var Hammer: any;
 
-class SwipeToGiveGesture {
+import {SwipeController} from './SwipeController'
+
+
+class SwipeGesture {
 
     constructor(private ele: HTMLElement, swipedOut) {
 
@@ -35,14 +37,24 @@ class SwipeToGiveGesture {
     template: '<ng-content></ng-content>'
 })
 export class Swipeable {
-    _gesture: SwipeToGiveGesture;
+    _gesture: SwipeGesture;
 
     @Output() swiped = new EventEmitter<void>();
 
-    constructor(private el: ElementRef) {
+    constructor(private el: ElementRef, private ctrl: SwipeController) {
+        ctrl.availabilityChanged.subscribe(availabilityInfo => this.updateAvailability(availabilityInfo));
     }
 
     ngOnInit() {
-        this._gesture = new SwipeToGiveGesture(this.el.nativeElement, () => this.swiped.emit(undefined));
+        this._gesture = new SwipeGesture(this.el.nativeElement, () => this.swiped.emit(undefined));
+        this.updateAvailability(this.ctrl.getAvailabilityInfo());
+    }
+
+    public updateAvailability(availabilityInfo) {
+        let ele = this.el.nativeElement;
+        if (availabilityInfo.available)
+            ele.classList.add('swipeable__available');
+        else
+            ele.classList.remove('swipeable__available');
     }
 }
