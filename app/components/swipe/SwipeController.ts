@@ -4,8 +4,13 @@ import {Observer} from 'rxjs/Observer';
 
 declare var cordova: any;
 
-function setupIBeacon() {
+function setupIBeacon(setAvailability: (boolean) => void) {
+    if (!cordova || !cordova.plugins)
+        return;
+
     var delegate = new cordova.plugins.locationManager.Delegate();
+
+    var rangingResults = [];
 
     delegate.didDetermineStateForRegion = function (pluginResult) {
         console.log('didDetermineStateForRegion: ', JSON.stringify(pluginResult));
@@ -16,6 +21,13 @@ function setupIBeacon() {
     };
 
     delegate.didRangeBeaconsInRegion = function (pluginResult) {
+        var isImmediate = pluginResult.beacons.length > 0 && (pluginResult.beacons[0].proximity == 'ProximityImmediate');
+        rangingResults.push(isImmediate);
+        if (rangingResults.length > 5)
+            rangingResults.shift();
+
+        setAvailability(rangingResults.some(_ => _));
+
         console.log('[DOM] didRangeBeaconsInRegion: ', JSON.stringify(pluginResult));
     };
 
@@ -40,10 +52,18 @@ export class SwipeController {
     private _availabilityInfo = { available: false };
 
     constructor() {
-        setupIBeacon();
+        setupIBeacon(_ => this.setAvailability(_));
 
         this.availabilityChanged = new Observable(observer =>
             this._observer = observer).share();
+    }
+
+    public setAvailability(available: boolean) {
+        if (this._availabilityInfo.available == available)
+            return;
+
+        this._availabilityInfo = {available: available};
+        this._observer.next(this._availabilityInfo);
     }
 
     public toggleAvailability() {
