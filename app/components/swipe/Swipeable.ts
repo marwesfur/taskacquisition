@@ -5,10 +5,55 @@ declare var Hammer: any;
 
 import {SwipeController} from './SwipeController'
 
-const pan = new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: 9}),
-      press = new Hammer.Press({time: 0, threshold: 100}),
-      swipe = new Hammer.Swipe({direction: Hammer.DIRECTION_UP});
+function LateSwipeRecognizer() {
+    Hammer.AttrRecognizer.apply(this, arguments);
+}
 
+Hammer.inherit(LateSwipeRecognizer, Hammer.AttrRecognizer, {
+    defaults: {
+        event: 'lateswipe',
+        threshold: 10,
+        velocity: 0.3,
+        direction: Hammer.DIRECTION_HORIZONTAL | Hammer.DIRECTION_VERTICAL,
+        pointers: 1
+    },
+
+    getTouchAction: function() {
+        return Hammer.Pan.prototype.getTouchAction.call(this);
+    },
+
+    attrTest: function(input) {
+        var direction = this.options.direction;
+        var velocity;
+
+        if (direction & (Hammer.DIRECTION_HORIZONTAL |Hammer. DIRECTION_VERTICAL)) {
+            velocity = input.velocity;
+        } else if (direction & Hammer.DIRECTION_HORIZONTAL) {
+            velocity = input.velocityX;
+        } else if (direction & Hammer.DIRECTION_VERTICAL) {
+            velocity = input.velocityY;
+        }
+
+        return this._super.attrTest.call(this, input) &&
+            direction & input.direction &&
+            input.distance > this.options.threshold &&
+            input.maxPointers == this.options.pointers &&
+            Math.abs(velocity) > this.options.velocity && input.eventType & Hammer.INPUT_END;
+    },
+
+    emit: function(input) {
+        //var direction = Hammer.directionStr(input.offsetDirection);
+        //if (direction) {
+        //    this.manager.emit(this.options.event + direction, input);
+        //}
+
+        this.manager.emit(this.options.event, input);
+    }
+});
+
+const pan = new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: 9}),
+    press = new Hammer.Press({time: 0, threshold: 100}),
+    swipe = new LateSwipeRecognizer({direction: Hammer.DIRECTION_UP});
 
 class SwipeGesture {
 
@@ -38,7 +83,7 @@ class SwipeGesture {
 
         let swiped = false;
 
-        mc.on('swipeup', e => {
+        mc.on('lateswipe', e => {
       //      this.ele.classList.add('swipeable__onBeforeSwipe');
       //      this.ele.classList.add('swipeable__onSwiped');
             console.log('swipeup vy=' + e.velocityY)
