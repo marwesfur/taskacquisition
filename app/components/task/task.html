@@ -1,4 +1,4 @@
-<swipeable (swiped)="swiped()">
+<swipeable [value]="value">
     <ion-card>
         <img [src]="value.getFrontImage().toResourceUrl()">
         <ion-card-content>

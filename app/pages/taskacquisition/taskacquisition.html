@@ -53,11 +53,9 @@
 
     <ion-row responsive-sm>
         <ion-col width-50 *ngFor="#task of savedTasks">
-
             <task [value]="task"
                   (delete)="deleteTask(task)"
                   (submit)="submitTask(task)"></task>
-
         </ion-col>
     </ion-row>
 

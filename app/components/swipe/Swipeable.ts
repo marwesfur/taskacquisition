@@ -55,11 +55,10 @@ const pan = new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: 9}),
     swipe = new LateSwipeRecognizer({direction: Hammer.DIRECTION_UP});
 
 class SwipeGesture {
-
     private _hammer;
     private _ani;
 
-    constructor(private ele: HTMLElement, private ctrl: SwipeController, private swipedOut) {
+    constructor(private ele: HTMLElement, private ctrl: SwipeController, private getValue) {
     }
 
     public listen() {
@@ -81,13 +80,14 @@ class SwipeGesture {
         let swiped = false;
 
         mc.on('lateswipe', e => {
+            this.ctrl.targetContainer.itemSwiped(this.getValue());
+
             swiped = true;
             ani
                 .fromTo('translateY', lastY + 'px', '-1000px')
                 .fromTo('rotateX', '45deg', '0')
                 .duration(4000)
                 .play();
-            setTimeout(this.swipedOut, 4000);
         });
 
         mc.on('panstart', e => {
@@ -119,11 +119,10 @@ class SwipeGesture {
         });
 
         mc.on('panmove', e => {
-
-            this.ctrl.moving(e.center, e.angle);
-
             if (swiped)
                 return;
+
+            this.ctrl.targetContainer.itemSwiping(e.center, e.angle);
             ani
                 .fromTo('translateX', lastX + 'px', e.deltaX + 'px')
                 .fromTo('translateY', lastY + 'px', e.deltaY + 'px')
@@ -152,18 +151,18 @@ class SwipeGesture {
 export class Swipeable {
     _gesture: SwipeGesture;
 
-    @Output() swiped = new EventEmitter<void>();
+    @Input() value: any;
 
     constructor(private el: ElementRef, private ctrl: SwipeController) {
-        this._gesture = new SwipeGesture(this.el.nativeElement, ctrl, () => this.swiped.emit(null));
-        ctrl.availabilityChanged.subscribe(availabilityInfo => this.updateAvailability(availabilityInfo));
+        this._gesture = new SwipeGesture(this.el.nativeElement, ctrl, () => this.value);
+        ctrl.targetsChanged.subscribe(availabilityInfo => this.updateTargetAvailability(availabilityInfo));
     }
 
     ngOnInit() {
-        this.updateAvailability(this.ctrl.getAvailabilityInfo());
+        this.updateTargetAvailability(this.ctrl.getAvailabilityInfo());
     }
 
-    public updateAvailability(availabilityInfo) {
+    public updateTargetAvailability(availabilityInfo) {
         let ele = this.el.nativeElement;
 
         if (availabilityInfo.available) {

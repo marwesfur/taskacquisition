@@ -64,7 +64,7 @@ function taskToFormData(task: Task) {
     }
 }
 
-function put(url: string, formData: FormData) {
+function put(url: string, formData: FormData): Promise<void> {
     return new Promise((resolve, reject) => {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function () {
@@ -97,12 +97,22 @@ export class TaskAcquisitionPage {
     public task:Task;
     public savedTasks: Task[] = [];
 
+    private targetsOpen = false;
+    private swipeTargets = [
+        { name: 'Kummerkasten', onSwiped: task => this.submitTask(task) },
+        { name: 'Mülleimer', onSwiped: task => this.deleteTask(task) },
+    ];
+
     constructor(public nav: NavController, private swipeCtrl: SwipeController) {
         this.newTask();
     }
 
     public toggleSwipeAvailability() {
-        this.swipeCtrl.toggleAvailability();
+        this.targetsOpen = !this.targetsOpen;
+        if (this.targetsOpen)
+            this.swipeTargets.forEach(_ => this.swipeCtrl.addTarget(_));
+        else
+            this.swipeTargets.forEach(_ => this.swipeCtrl.removeTarget(_));
     }
 
     public newTask() {
@@ -124,12 +134,13 @@ export class TaskAcquisitionPage {
         }
     }
 
-    public deleteTask(task: Task) {
+    public deleteTask(task: Task): Promise<void> {
         this.savedTasks = this.savedTasks.filter(_ => _ != task);
+        return Promise.resolve();
     }
 
-    public submitTask(task: Task) {
-        waitWhile(this.nav, put(createTaskUrl, taskToFormData(task)))
+    public submitTask(task: Task): Promise<void> {
+        return waitWhile(this.nav, put(createTaskUrl, taskToFormData(task)))
             .then(() => {
                 let alert = Alert.create({
                     title: 'Übertragen',

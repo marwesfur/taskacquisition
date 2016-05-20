@@ -6,48 +6,45 @@ import {SwipeController} from './SwipeController'
 
 
 @Component({
-    selector: 'swipe-target',
+    selector: 'swipe-target-container',
     templateUrl: 'build/components/swipe/SwipeTarget.html',
     directives: [NgClass]
 })
-export class SwipeTarget {
+export class TargetContainer {
     @Input() content: any;
 
     ani: Animation;
     targets: any[] = [];
 
     constructor(private el:ElementRef, private ctrl: SwipeController) {
-        ctrl.availabilityChanged.subscribe(availabilityInfo => this.onAvailabilityChanged(availabilityInfo));
-        ctrl.determineTarget = this.determineTarget.bind(this);
+        ctrl.targetContainer = this;
+    }
 
+    ngOnInit() {
         this.ani = new Animation();
         this.ani
             .easing('ease')
             .duration(250);
-    }
 
-    ngOnInit() {
-        let cntEle = this.content.getNativeElement();
-
-        let targetAni = new Animation(this.el.nativeElement);
-        targetAni.fromTo('translateY', '-100px', '0px');
-        targetAni.fromTo('background', 'red', 'green');
+        const targetAni = new Animation(this.el.nativeElement);
+        targetAni.fromTo('translateY', '-100px', '0px')
         this.ani.add(targetAni);
 
-        let contentAni = new Animation(cntEle);
+        const cntEle = this.content.getNativeElement();
+        const contentAni = new Animation(cntEle);
         contentAni.fromTo('translateY', '0px', '100px');
         this.ani.add(contentAni);
     }
 
-    public onAvailabilityChanged(availabilityInfo) {
+    public updateTargets(targetInfo) {
         this.ani
-            .reverse(!availabilityInfo.available)
+            .reverse(!targetInfo.available)
             .play();
 
-        this.targets = availabilityInfo.targets;
+        this.targets = targetInfo.targets;
     }
 
-    private determineTarget(center, angle) {
+    public itemSwiping(center, angle) {
         const widthPerTarget = this.el.nativeElement.offsetWidth / this.targets.length;
         const targetsWithBoundaries = this.targets.map((target, idx) => {
             const left = idx*widthPerTarget,
@@ -71,6 +68,11 @@ export class SwipeTarget {
 
             targetWithBoundaries.target.isSelected = rightOfLeft && leftOfRight;
         });
+    }
+
+    public itemSwiped(data) {
+        var target = this.targets.find(_ => _.isSelected);
+        target.onSwiped(data);
     }
 }
 
