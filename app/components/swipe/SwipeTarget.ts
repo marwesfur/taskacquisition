@@ -1,20 +1,24 @@
 import {Component, forwardRef, Directive, Host, EventEmitter, ElementRef, NgZone, Input, Output, Renderer, ChangeDetectionStrategy, ViewEncapsulation, OnInit, OnDestroy, Injectable} from 'angular2/core';
 import {Animation} from 'ionic-angular/animations/animation'
+import {NgClass} from 'angular2/common';
 
 import {SwipeController} from './SwipeController'
 
 
 @Component({
     selector: 'swipe-target',
-    template: '<div>Hierher swipen</div>'
+    templateUrl: 'build/components/swipe/SwipeTarget.html',
+    directives: [NgClass]
 })
 export class SwipeTarget {
     @Input() content: any;
 
     ani: Animation;
+    targets: any[] = [];
 
     constructor(private el:ElementRef, private ctrl: SwipeController) {
         ctrl.availabilityChanged.subscribe(availabilityInfo => this.onAvailabilityChanged(availabilityInfo));
+        ctrl.determineTarget = this.determineTarget.bind(this);
 
         this.ani = new Animation();
         this.ani
@@ -39,6 +43,34 @@ export class SwipeTarget {
         this.ani
             .reverse(!availabilityInfo.available)
             .play();
+
+        this.targets = availabilityInfo.targets;
+    }
+
+    private determineTarget(center, angle) {
+        const widthPerTarget = this.el.nativeElement.offsetWidth / this.targets.length;
+        const targetsWithBoundaries = this.targets.map((target, idx) => {
+            const left = idx*widthPerTarget,
+                  right = left+widthPerTarget;
+
+            const dxLeft = left-center.x,
+                  dxRight = right-center.x,
+                  dy = 100 - center.y;
+
+            return {
+                target: target,
+                left: Math.atan2(dy, dxLeft) * 180 / Math.PI,
+                right: Math.atan2(dy, dxRight) * 180 / Math.PI
+            };
+
+        });
+
+        targetsWithBoundaries.forEach((targetWithBoundaries, idx) => {
+            var rightOfLeft = idx == 0 ? true : targetWithBoundaries.left <= angle,
+                leftOfRight = idx == targetsWithBoundaries.length -1 ? true : targetWithBoundaries.right >= angle;
+
+            targetWithBoundaries.target.isSelected = rightOfLeft && leftOfRight;
+        });
     }
 }
 

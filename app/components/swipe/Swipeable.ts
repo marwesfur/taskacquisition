@@ -52,7 +52,6 @@ Hammer.inherit(LateSwipeRecognizer, Hammer.AttrRecognizer, {
 });
 
 const pan = new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: 9}),
-    press = new Hammer.Press({time: 0, threshold: 100}),
     swipe = new LateSwipeRecognizer({direction: Hammer.DIRECTION_UP});
 
 class SwipeGesture {
@@ -60,7 +59,7 @@ class SwipeGesture {
     private _hammer;
     private _ani;
 
-    constructor(private ele: HTMLElement, private swipedOut) {
+    constructor(private ele: HTMLElement, private ctrl: SwipeController, private swipedOut) {
     }
 
     public listen() {
@@ -75,8 +74,6 @@ class SwipeGesture {
 
         mc.add(swipe);
         mc.add(pan).recognizeWith(swipe);
-        //mc.add(press).recognizeWith(pan);
-        //.recognizeWith(press);
 
         let lastX = 0,
             lastY = 0;
@@ -84,9 +81,6 @@ class SwipeGesture {
         let swiped = false;
 
         mc.on('lateswipe', e => {
-      //      this.ele.classList.add('swipeable__onBeforeSwipe');
-      //      this.ele.classList.add('swipeable__onSwiped');
-            console.log('swipeup vy=' + e.velocityY)
             swiped = true;
             ani
                 .fromTo('translateY', lastY + 'px', '-1000px')
@@ -96,17 +90,7 @@ class SwipeGesture {
             setTimeout(this.swipedOut, 4000);
         });
 
-        mc.on('press', e => {
-            //this.ele.classList.add('swipeable__onBeforeSwipe');
-        });
-
-        mc.on('pressup', e => {
-            //this.ele.classList.remove('swipeable__onBeforeSwipe');
-        });
-
         mc.on('panstart', e => {
-            //this.ele.classList.add('swipeable__onBeforeSwipe');
-            console.log('------\npanstart')
             ani = new Animation(ele);
             ani
                 .fromTo('translateX', lastX + 'px', e.deltaX + 'px')
@@ -121,8 +105,6 @@ class SwipeGesture {
         });
 
         mc.on('panend', e => {
-            //this.ele.classList.remove('swipeable__onBeforeSwipe');
-            console.log('panned')
             if (swiped)
                 return;
             ani
@@ -137,7 +119,9 @@ class SwipeGesture {
         });
 
         mc.on('panmove', e => {
-            console.log('panmove')
+
+            this.ctrl.moving(e.center, e.angle);
+
             if (swiped)
                 return;
             ani
@@ -171,7 +155,7 @@ export class Swipeable {
     @Output() swiped = new EventEmitter<void>();
 
     constructor(private el: ElementRef, private ctrl: SwipeController) {
-        this._gesture = new SwipeGesture(this.el.nativeElement, () => this.swiped.emit(null));
+        this._gesture = new SwipeGesture(this.el.nativeElement, ctrl, () => this.swiped.emit(null));
         ctrl.availabilityChanged.subscribe(availabilityInfo => this.updateAvailability(availabilityInfo));
     }
 

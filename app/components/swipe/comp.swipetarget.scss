@@ -12,6 +12,10 @@ swipe-target {
   z-index: 99;
 }
 
+.selectedTarget {
+  background: red;
+}
+
 swipeable {
   display: block;
 }

@@ -5,6 +5,8 @@ import {Observer} from 'rxjs/Observer';
 declare var cordova: any;
 
 function setupIBeacon(setAvailability: (boolean) => void) {
+    return;
+
     if (!cordova || !cordova.plugins)
         return;
 
@@ -45,11 +47,17 @@ function setupIBeacon(setAvailability: (boolean) => void) {
         .done();
 }
 
+const targets = [
+    {name: 'VIP', id: 'vip'},
+    {name: 'Mülleimer', id: 'trash'}
+];
+
 export class SwipeController {
 
     public availabilityChanged: Observable<{available: boolean}>;
     private _observer: Observer;
     private _availabilityInfo = { available: false };
+    public determineTarget;
 
     constructor() {
         setupIBeacon(_ => this.setAvailability(_));
@@ -62,16 +70,20 @@ export class SwipeController {
         if (this._availabilityInfo.available == available)
             return;
 
-        this._availabilityInfo = {available: available};
+        this._availabilityInfo = {available: available, targets: available ? targets : []};
         this._observer.next(this._availabilityInfo);
     }
 
     public toggleAvailability() {
-        this._availabilityInfo = {available: !this._availabilityInfo.available};
+        this._availabilityInfo = {available: !this._availabilityInfo.available, targets: !this._availabilityInfo.available ? targets : []};
         this._observer.next(this._availabilityInfo);
     }
 
     public getAvailabilityInfo() {
         return this._availabilityInfo;
+    }
+
+    public moving(center, angle) {
+        this.determineTarget(center, angle);
     }
 }
