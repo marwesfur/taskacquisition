@@ -80,13 +80,12 @@ class SwipeGesture {
         let swiped = false;
 
         mc.on('lateswipe', e => {
-            this.ctrl.targetContainer.itemSwiped(this.getValue());
-
             swiped = true;
             ani
                 .fromTo('translateY', lastY + 'px', '-1000px')
                 .fromTo('rotateX', '45deg', '0')
                 .duration(4000)
+                .onFinish(() => this.ctrl.targetContainer.itemSwiped(this.getValue()))
                 .play();
         });
 

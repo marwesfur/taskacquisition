@@ -148,8 +148,9 @@ export class TaskAcquisitionPage {
                     buttons: ['OK']
                 });
                 this.nav.present(alert);
-                this.deleteTask(task);
-            });
+            })
+            .catch(() => { })
+            .then(() => this.deleteTask(task));
     }
 
     public deleteImage(img: Image) {
