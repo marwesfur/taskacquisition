@@ -1,15 +1,16 @@
 import {App, IonicApp, Platform, MenuController} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {TaskAcquisitionPage} from './pages/taskacquisition/taskacquisition';
-import {RekoPage} from './pages/reko/reko';
+import {SettingsPage} from './pages/settings/settings';
 import {TargetContainer} from './components/swipe/TargetContainer'
 import {SwipeController} from './components/swipe/SwipeController'
 import {Tasks} from "./model/services/tasks";
+import {Settings} from "./model/services/settings";
 
 @App({
   templateUrl: 'build/app.html',
   directives: [TargetContainer],
-  providers: [SwipeController, Tasks],
+  providers: [SwipeController, Tasks, Settings],
   config: {} // http://ionicframework.com/docs/v2/api/config/Config/
 })
 class MyApp {
@@ -19,14 +20,15 @@ class MyApp {
   constructor(
     private app: IonicApp,
     private platform: Platform,
-    private menu: MenuController
+    private menu: MenuController,
+    private settings: Settings // trigger loading settings from local storage
   ) {
     this.initializeApp();
 
     // set our app's pages
     this.pages = [
       { title: 'Störungserfassung', component: TaskAcquisitionPage },
-      { title: 'Reko', component: RekoPage }
+      { title: 'Einstellungen', component: SettingsPage }
     ];
   }
 

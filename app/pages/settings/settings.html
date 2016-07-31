@@ -1,0 +1,21 @@
+<ion-navbar *navbar>
+  <ion-title>Einstellungen</ion-title>
+</ion-navbar>
+
+<ion-content padding>
+  <ion-list>
+
+    <ion-item>
+      <ion-label floating>Url for creating tasks</ion-label>
+      <ion-input type="text" [(ngModel)]="url"></ion-input>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-buttons end>
+    <button primary block (click)="save()">
+      Save
+    </button>
+  </ion-buttons>
+
+</ion-content>
