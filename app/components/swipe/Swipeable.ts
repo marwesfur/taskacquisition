@@ -51,9 +51,6 @@ Hammer.inherit(LateSwipeRecognizer, Hammer.AttrRecognizer, {
     }
 });
 
-const pan = new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: 9}),
-    swipe = new (<any>LateSwipeRecognizer)({direction: Hammer.DIRECTION_UP});
-
 class SwipeGesture {
     private _hammer;
     private _ani;
@@ -70,6 +67,9 @@ class SwipeGesture {
 
         let ani = this._ani = new Animation(ele);
         ani.duration(0);
+
+        const pan = new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: 9}),
+            swipe = new (<any>LateSwipeRecognizer)({direction: Hammer.DIRECTION_UP});
 
         mc.add(swipe);
         mc.add(pan).recognizeWith(swipe);
@@ -95,7 +95,7 @@ class SwipeGesture {
                 .fromTo('translateX', lastX + 'px', e.deltaX + 'px')
                 .fromTo('translateY', lastY + 'px', e.deltaY + 'px')
                 .fromTo('perspective', '600px', '600px')
-                .fromTo('rotateX', '0', '45deg')
+                .fromTo('rotateX', '0', '20deg')
                 .duration(200)
                 .play();
 
@@ -152,6 +152,7 @@ export class Swipeable {
     @Input('swipeable') value: any;
 
     constructor(private el: ElementRef, private ctrl: SwipeController) {
+        var i = 0;
     }
 
     ngAfterViewInit() {
