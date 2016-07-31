@@ -6,38 +6,9 @@ import TaskComponent from '../../components/task/Task';
 import {SwipeController} from '../../components/swipe/SwipeController'
 import {Tasks} from "../../model/services/tasks";
 import {Swipeable} from "../../components/swipe/Swipeable";
-import {put} from "../../infrastructure/http"
+import {waitWhile} from "../../infrastructure/waitwhile"
 
 
-const createTaskUrl = 'http://172.24.59.212:8123/tasks/tasks';
-
-function taskToFormData(task: Task) {
-    var formData = new FormData();
-    formData.append('title', task.title);
-    task.images.forEach((img, idx) => {
-        formData.append(`description${idx}`, img.description);
-        formData.append("files[]", toBlob(img), `image${idx}.jpg`);
-    });
-
-    return formData;
-
-    function toBlob(img: Image) {
-        var byteCharacters = atob(img.src);
-        var byteNumbers = new Array(byteCharacters.length);
-        for (var i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        var byteArray = new Uint8Array(byteNumbers);
-        return new Blob([byteArray], {type: 'image/jpg'});
-    }
-}
-
-function waitWhile<T>(nav: NavController, p: Promise<T>): Promise<T> {
-    let loading = Loading.create({content: "Wird übertragen"});
-    nav.present(loading);
-    p.then(() => loading.dismiss(), () => loading.dismiss());
-    return p;
-}
 
 @Page({
     templateUrl: 'build/pages/taskacquisition/taskacquisition.html',
@@ -77,7 +48,7 @@ export class TaskAcquisitionPage {
     }
 
     public submitTask(task: Task): Promise<void> {
-        return waitWhile(this.nav, put(createTaskUrl, taskToFormData(task)))
+        return waitWhile(this.nav, this.tasks.sendTask(task))
             .then(() => {
                 let alert = Alert.create({
                     title: 'Übertragen',
@@ -87,6 +58,7 @@ export class TaskAcquisitionPage {
                 this.nav.present(alert);
             })
             .catch(() => {
+                // todo: handle error case
             })
             .then(() => this.deleteTask(task));
     }
