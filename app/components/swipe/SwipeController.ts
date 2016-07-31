@@ -3,8 +3,6 @@ import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/share';
 import {TargetContainer} from './TargetContainer';
 
-declare var cordova: any;
-
 export class SwipeController {
 
     public targetContainer: TargetContainer;
@@ -19,19 +17,23 @@ export class SwipeController {
 
     public addTarget(target) {
         const newTargets = this._targetsInfo.targets.concat([target]);
-        this._targetsInfo = {available: newTargets.length > 0, targets: newTargets};
-        this.targetContainer.updateTargets(this._targetsInfo);
-        this._observer.next(this._targetsInfo);
+        this.setNewTargets(newTargets);
     }
 
     public removeTarget(target) {
         const newTargets = this._targetsInfo.targets.filter(_ => _ != target);
-        this._targetsInfo = {available: newTargets.length > 0, targets: newTargets};
-        this.targetContainer.updateTargets(this._targetsInfo);
-        this._observer.next(this._targetsInfo);
+        this.setNewTargets(newTargets);
     }
 
     public getAvailabilityInfo() {
         return this._targetsInfo;
+    }
+
+    private setNewTargets(newTargets) {
+        this._targetsInfo = {available: newTargets.length > 0, targets: newTargets};
+        this.targetContainer.updateTargets(this._targetsInfo);
+        if (this._observer) {
+            this._observer.next(this._targetsInfo);
+        }
     }
 }

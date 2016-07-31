@@ -14,7 +14,7 @@ export class TargetContainer {
     @Input() content: any;
 
     ani: Animation;
-    targets: any[] = [];
+    targetsInfo = {available: false, targets: []};
 
     constructor(private el:ElementRef, private ctrl: SwipeController) {
         ctrl.targetContainer = this;
@@ -37,16 +37,18 @@ export class TargetContainer {
     }
 
     public updateTargets(targetInfo) {
-        this.ani
-            .reverse(!targetInfo.available)
-            .play();
+        if (this.targetsInfo.available != targetInfo.available) {
+            this.ani
+                .reverse(!targetInfo.available)
+                .play();
+        }
 
-        this.targets = targetInfo.targets;
+        this.targetsInfo = targetInfo;
     }
 
     public itemSwiping(center, angle) {
-        const widthPerTarget = this.el.nativeElement.offsetWidth / this.targets.length;
-        const targetsWithBoundaries = this.targets.map((target, idx) => {
+        const widthPerTarget = this.el.nativeElement.offsetWidth / this.targetsInfo.targets.length;
+        const targetsWithBoundaries = this.targetsInfo.targets.map((target, idx) => {
             const left = idx*widthPerTarget,
                   right = left+widthPerTarget;
 
@@ -71,7 +73,7 @@ export class TargetContainer {
     }
 
     public itemSwiped(data) {
-        var target = this.targets.find(_ => _.isSelected);
+        var target = this.targetsInfo.targets.find(_ => _.isSelected);
         target.onSwiped(data);
     }
 }

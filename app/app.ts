@@ -1,3 +1,4 @@
+import {provide} from 'angular2/core';
 import {App, IonicApp, Platform, MenuController} from 'ionic-angular';
 import {StatusBar} from 'ionic-native';
 import {TaskAcquisitionPage} from './pages/taskacquisition/taskacquisition';
@@ -6,11 +7,12 @@ import {TargetContainer} from './components/swipe/TargetContainer'
 import {SwipeController} from './components/swipe/SwipeController'
 import {Tasks} from "./model/services/tasks";
 import {Settings} from "./model/services/settings";
+import {Localization, RemoteControlledLocalization} from "./model/services/localization";
 
 @App({
   templateUrl: 'build/app.html',
   directives: [TargetContainer],
-  providers: [SwipeController, Tasks, Settings],
+  providers: [SwipeController, Tasks, Settings, provide(Localization, {useClass: RemoteControlledLocalization})],
   config: {} // http://ionicframework.com/docs/v2/api/config/Config/
 })
 class MyApp {

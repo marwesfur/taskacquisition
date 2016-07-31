@@ -1,9 +1,11 @@
+import {Injectable} from "angular2/core"
 import {get} from "../../infrastructure/http"
 import {Observable} from 'rxjs/Observable';
 import {Observer} from 'rxjs/Observer';
 import 'rxjs/add/operator/share';
+import {Settings} from './settings';
 
-
+// todo: wrap iBeacon stuff in iBeaconLocalization
 function setupIBeacon() {
     //var uuid = 'B9407F30-F5F8-466E-AFF9-25556B57FE6D';
     //var identifier = 'beaconOnTheTable';
@@ -37,39 +39,49 @@ function setupIBeacon() {
     //    .done();
 }
 
-function setupRemoteController(setLocation) {
-    const device = 'taskAcquisition';
-    const url = 'http://172.24.59.212:8123/dispatcher/location?device=' + device;
-
-    function poll() {
-        get(url)
-            .then(location => {
-                setLocation(location);
-                setTimeout(poll, 1000);
-            });
-    }
-
-    poll();
+export abstract class Localization {
+    locationChanged: Observable<any>;
+    abstract start(): void;
+    abstract stop(): void;
+    abstract getLocation(): string;
 }
 
+const pollingIntervalInMs = 1000;
 
-export class Localization {
+@Injectable()
+export class RemoteControlledLocalization extends Localization {
 
     public locationChanged: Observable<any>;
 
     private _observer: Observer<any>;
     private location: string;
+    private timeout: any;
 
-    constructor() {
+    constructor(private settings: Settings) {
+        super();
         this.locationChanged = new Observable(observer => this._observer = observer).share();
-
-        setupRemoteController(location => this.setLocation(location));
-        //setupIBeacon();
     }
 
+    public start() {
+        this.timeout = setTimeout(() => this.poll(), pollingIntervalInMs);
+    }
+
+    public stop() {
+        clearTimeout(this.timeout);
+    }
 
     public getLocation() {
         return this.location;
+    }
+
+    private poll() {
+        console.log(`polling ${this.settings.getRemoteControllerUrl()}`);
+
+        get(this.settings.getRemoteControllerUrl())
+            .then(location => {
+                this.setLocation(location);
+                this.start();
+            }, () => this.start()); // in case of error, just try again.
     }
 
     private setLocation(location) {

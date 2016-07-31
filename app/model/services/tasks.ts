@@ -47,6 +47,6 @@ export class Tasks {
     }
 
     public sendTask(task: Task): Promise<void> {
-        return put(this.settings.getUrl(), taskToFormData(task));
+        return put(this.settings.getTaskUrl(), taskToFormData(task));
     }
 }

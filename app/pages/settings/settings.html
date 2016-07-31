@@ -6,16 +6,35 @@
   <ion-list>
 
     <ion-item>
+      <ion-label floating>Device name for remote controller</ion-label>
+      <ion-input type="text" [(ngModel)]="deviceName"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label floating>Host and Port</ion-label>
+      <ion-input type="text" [(ngModel)]="host"></ion-input>
+    </ion-item>
+
+    <ion-item>
       <ion-label floating>Url for creating tasks</ion-label>
-      <ion-input type="text" [(ngModel)]="url"></ion-input>
+      <ion-input type="text" [ngModel]="getTaskUrl()" readonly></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label floating>Remote controller url</ion-label>
+      <ion-input type="text" [ngModel]="getRemoteControllerUrl()" readonly></ion-input>
     </ion-item>
 
   </ion-list>
 
-  <ion-buttons end>
-    <button primary block (click)="save()">
-      Save
-    </button>
-  </ion-buttons>
+
+  <button block light (click)="cancel()">
+    Cancel
+  </button>
+
+
+  <button primary block (click)="save()">
+    Save
+  </button>
 
 </ion-content>

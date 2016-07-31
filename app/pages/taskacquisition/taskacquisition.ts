@@ -1,12 +1,22 @@
+import {OnInit, OnDestroy} from 'angular2/core';
 import {Page, Alert, NavController, Loading} from 'ionic-angular';
-
 import {CreateTaskPage} from '../createtask/createtask';
 import {Task, Image} from '../../model/types';
 import TaskComponent from '../../components/task/Task';
 import {SwipeController} from '../../components/swipe/SwipeController'
 import {Tasks} from "../../model/services/tasks";
+import {Localization} from "../../model/services/localization";
 import {Swipeable} from "../../components/swipe/Swipeable";
 import {waitWhile} from "../../infrastructure/waitwhile"
+import {Subscription} from "rxjs/Subscription"
+
+
+const unknownLocation = 'unknown';
+
+const swipeTargets = [
+    //{ name: 'Mülleimer', onSwiped: task => this.deleteTask(task) },
+    { name: 'Kummerkasten', onSwiped: task => this.submitTask(task) },
+];
 
 
 
@@ -14,24 +24,30 @@ import {waitWhile} from "../../infrastructure/waitwhile"
     templateUrl: 'build/pages/taskacquisition/taskacquisition.html',
     directives: [TaskComponent, Swipeable]
 })
-export class TaskAcquisitionPage {
-
+export class TaskAcquisitionPage implements OnInit, OnDestroy {
     private targetsOpen = false;
-    private swipeTargets = [
-        //{ name: 'Mülleimer', onSwiped: task => this.deleteTask(task) },
-        { name: 'Kummerkasten', onSwiped: task => this.submitTask(task) },
-    ];
+    private subscription: Subscription = null;
 
-    constructor(public nav: NavController, private swipeCtrl: SwipeController, public tasks: Tasks) {
-        console.log('task acquisition constructor');
+    constructor(public nav: NavController, private swipeCtrl: SwipeController, public tasks: Tasks, private localization: Localization) {
+
+    }
+
+    ngOnInit() {
+        this.subscription = this.localization.locationChanged.subscribe(() => {
+            this.targetsOpen = this.localization.getLocation() !== unknownLocation;
+            this.onTargetsOpenChanged();
+        });
+        this.localization.start();
+    }
+
+    ngOnDestroy() {
+        this.subscription.unsubscribe();
+        this.localization.stop();
     }
 
     public toggleSwipeAvailability() {
         this.targetsOpen = !this.targetsOpen;
-        if (this.targetsOpen)
-            this.swipeTargets.forEach(_ => this.swipeCtrl.addTarget(_));
-        else
-            this.swipeTargets.forEach(_ => this.swipeCtrl.removeTarget(_));
+        this.onTargetsOpenChanged();
     }
 
     public getTasks() {
@@ -61,5 +77,12 @@ export class TaskAcquisitionPage {
                 // todo: handle error case
             })
             .then(() => this.deleteTask(task));
+    }
+
+    private onTargetsOpenChanged() {
+        swipeTargets.forEach(_ => this.swipeCtrl.removeTarget(_));
+        if (this.targetsOpen) {
+            swipeTargets.forEach(_ => this.swipeCtrl.addTarget(_));
+        }
     }
 }

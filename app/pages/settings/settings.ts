@@ -8,18 +8,33 @@ import {TaskAcquisitionPage} from '../taskacquisition/taskacquisition'
 })
 export class SettingsPage implements OnInit {
 
-  public url: string;
+  public host: string;
+  public deviceName: string;
 
   constructor(private settings: Settings, private nav: NavController) {
 
   }
 
   public ngOnInit() {
-    this.url = this.settings.getUrl();
+    this.host = this.settings.getHost();
+    this.deviceName = this.settings.getDeviceName();
+  }
+
+  public getRemoteControllerUrl() {
+    return this.settings.getRemoteControllerUrl(this.host, this.deviceName);
+  }
+
+  public getTaskUrl() {
+    return this.settings.getTaskUrl(this.host);
   }
 
   public save() {
-    this.settings.setUrl(this.url);
+    this.settings.setHost(this.host);
+    this.settings.setDeviceName(this.deviceName);
+    this.nav.setRoot(TaskAcquisitionPage, {});
+  }
+
+  public cancel() {
     this.nav.setRoot(TaskAcquisitionPage, {});
   }
 }
