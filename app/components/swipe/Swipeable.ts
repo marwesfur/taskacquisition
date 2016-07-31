@@ -52,7 +52,7 @@ Hammer.inherit(LateSwipeRecognizer, Hammer.AttrRecognizer, {
 });
 
 const pan = new Hammer.Pan({direction: Hammer.DIRECTION_ALL, threshold: 9}),
-    swipe = new LateSwipeRecognizer({direction: Hammer.DIRECTION_UP});
+    swipe = new (<any>LateSwipeRecognizer)({direction: Hammer.DIRECTION_UP});
 
 class SwipeGesture {
     private _hammer;
@@ -82,9 +82,9 @@ class SwipeGesture {
         mc.on('lateswipe', e => {
             swiped = true;
             ani
-                .fromTo('translateY', lastY + 'px', '-1000px')
+                .fromTo('translateY', lastY + 'px', '-400px')
                 .fromTo('rotateX', '45deg', '0')
-                .duration(4000)
+                .duration(1000)
                 .onFinish(() => this.ctrl.targetContainer.itemSwiped(this.getValue()))
                 .play();
         });
@@ -143,21 +143,20 @@ class SwipeGesture {
     }
 }
 
-@Component({
-    selector: 'swipeable',
-    template: '<ng-content></ng-content>'
+@Directive({
+    selector: '[swipeable]',
 })
 export class Swipeable {
     _gesture: SwipeGesture;
 
-    @Input() value: any;
+    @Input('swipeable') value: any;
 
     constructor(private el: ElementRef, private ctrl: SwipeController) {
-        this._gesture = new SwipeGesture(this.el.nativeElement, ctrl, () => this.value);
-        ctrl.targetsChanged.subscribe(availabilityInfo => this.updateTargetAvailability(availabilityInfo));
     }
 
-    ngOnInit() {
+    ngAfterViewInit() {
+        this._gesture = new SwipeGesture(this.el.nativeElement, this.ctrl, () => this.value);
+        this.ctrl.targetsChanged.subscribe(availabilityInfo => this.updateTargetAvailability(availabilityInfo));
         this.updateTargetAvailability(this.ctrl.getAvailabilityInfo());
     }
 

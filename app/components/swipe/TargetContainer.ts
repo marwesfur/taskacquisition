@@ -7,7 +7,7 @@ import {SwipeController} from './SwipeController'
 
 @Component({
     selector: 'swipe-target-container',
-    templateUrl: 'build/components/swipe/SwipeTarget.html',
+    templateUrl: 'build/components/swipe/TargetContainer.html',
     directives: [NgClass]
 })
 export class TargetContainer {

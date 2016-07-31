@@ -2,7 +2,7 @@
     <button menuToggle>
         <ion-icon name="menu"></ion-icon>
     </button>
-    <ion-title>Störungserfassung</ion-title>
+    <ion-title>Erfasste Störungen</ion-title>
 
     <ion-buttons end>
         <button (click)="toggleSwipeAvailability()">
@@ -14,49 +14,40 @@
 
 <ion-content padding class="getting-started">
 
-    <h3>Neue Störung vormerken</h3>
+
+    <!--<ion-row responsive-sm>-->
+        <!--<ion-col width-50 *ngFor="#task of getTasks()">-->
+            <!--<task [value]="task"-->
+                  <!--(delete)="deleteTask(task)"-->
+                  <!--(submit)="deleteTask(task)"></task>-->
+        <!--</ion-col>-->
+    <!--</ion-row>-->
+
+    <p *ngIf="getTasks().length == 0">Noch keine Störungen erfasst</p>
 
     <ion-list>
-
-        <ion-item>
-            <ion-label floating>Gesamtbeschreibung</ion-label>
-            <ion-input type="text" [(ngModel)]="task.title"></ion-input>
-        </ion-item>
-
-        <ion-item *ngFor="#image of task.images">
-            <ion-thumbnail item-left>
-                <img [src]="image.toResourceUrl()">
-            </ion-thumbnail>
-            <ion-label floating>Bildbeschreibung (optional)</ion-label>
-            <ion-input type="text" [(ngModel)]="image.description"></ion-input>
-            <button danger item-right clear (click)="deleteImage(image)">
-                <ion-icon name='trash' is-active="false"></ion-icon>
-            </button>
-        </ion-item>
-
-        <ion-item>
-            <button primary (click)="pickImage()">
-                <ion-icon name="add"></ion-icon>
-                Bild hinzufügen
-            </button>
-        </ion-item>
-
+        <ion-item-sliding *ngFor="#task of getTasks()" [swipeable]="task">
+            <ion-item>
+                <ion-thumbnail item-left>
+                    <img [src]="task.getFrontImage().toResourceUrl()">
+                </ion-thumbnail>
+                <h2>{{task.title}}</h2>
+                <p>Erfasst am {{task.date | date:'short'}}</p>
+            </ion-item>
+            <ion-item-options>
+                <button primary (click)="submitTask(task)">
+                    <ion-icon name="cloud-upload"></ion-icon>
+                    Senden
+                </button>
+                <button danger (click)="deleteTask(task)">
+                    <ion-icon name="trash"></ion-icon>
+                    Löschen
+                </button>
+            </ion-item-options>
+        </ion-item-sliding>
     </ion-list>
 
-    <p>
-        <button primary (click)="saveTask()">Speichern</button>
-    </p>
 
-    <hr />
-
-    <h3>Vorgemerkte Störungen</h3>
-
-    <ion-row responsive-sm>
-        <ion-col width-50 *ngFor="#task of savedTasks">
-            <task [value]="task"
-                  (delete)="deleteTask(task)"
-                  (submit)="submitTask(task)"></task>
-        </ion-col>
-    </ion-row>
+    <button fab fab-right (click)="createTask()"><ion-icon name="add"></ion-icon></button>
 
 </ion-content>

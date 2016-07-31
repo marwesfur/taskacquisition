@@ -5,45 +5,6 @@ import {TargetContainer} from './TargetContainer';
 
 declare var cordova: any;
 
-function setupIBeacon(ctrl: SwipeController) {
-    //var delegate = new cordova.plugins.locationManager.Delegate();
-    //
-    //var rangingResults = [];
-    //
-    //delegate.didDetermineStateForRegion = function (pluginResult) {
-    //    console.log('didDetermineStateForRegion: ', JSON.stringify(pluginResult));
-    //};
-    //
-    //delegate.didStartMonitoringForRegion = function (pluginResult) {
-    //    console.log('didStartMonitoringForRegion:', pluginResult);
-    //};
-    //
-    //delegate.didRangeBeaconsInRegion = function (pluginResult) {
-    //    var isImmediate = pluginResult.beacons.length > 0 && (pluginResult.beacons[0].proximity == 'ProximityImmediate');
-    //    rangingResults.push(isImmediate);
-    //    if (rangingResults.length > 5)
-    //        rangingResults.shift();
-    //
-    //    // todo: add target to controller
-    //    //setAvailability(rangingResults.some(_ => _));
-    //
-    //    console.log('[DOM] didRangeBeaconsInRegion: ', JSON.stringify(pluginResult));
-    //};
-    //
-    //var uuid = 'B9407F30-F5F8-466E-AFF9-25556B57FE6D';
-    //var identifier = 'beaconOnTheMacBooksShelf';
-    //var minor = undefined; //53356;
-    //var major = undefined; //55998;
-    //var beaconRegion = new cordova.plugins.locationManager.BeaconRegion(identifier, uuid, major, minor);
-    //
-    //cordova.plugins.locationManager.setDelegate(delegate);
-    //cordova.plugins.locationManager.requestAlwaysAuthorization();
-    //
-    //cordova.plugins.locationManager.startRangingBeaconsInRegion(beaconRegion)
-    //    .fail(function(e) { console.error(e); })
-    //    .done();
-}
-
 export class SwipeController {
 
     public targetContainer: TargetContainer;
@@ -53,7 +14,6 @@ export class SwipeController {
     private _targetsInfo = { available: false, targets: [] };
 
     constructor() {
-        setupIBeacon(this);
         this.targetsChanged = new Observable(observer => this._observer = observer).share();
     }
 

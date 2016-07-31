@@ -4,11 +4,12 @@ import {TaskAcquisitionPage} from './pages/taskacquisition/taskacquisition';
 import {RekoPage} from './pages/reko/reko';
 import {TargetContainer} from './components/swipe/TargetContainer'
 import {SwipeController} from './components/swipe/SwipeController'
+import {Tasks} from "./model/services/tasks";
 
 @App({
   templateUrl: 'build/app.html',
   directives: [TargetContainer],
-  providers: [SwipeController],
+  providers: [SwipeController, Tasks],
   config: {} // http://ionicframework.com/docs/v2/api/config/Config/
 })
 class MyApp {

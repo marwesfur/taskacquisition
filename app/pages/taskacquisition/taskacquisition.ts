@@ -1,47 +1,15 @@
 import {Page, Alert, NavController, Loading} from 'ionic-angular';
-import {ImagePicker} from 'ionic-native';
-import {Camera} from 'ionic-native';
 
+import {CreateTaskPage} from '../createtask/createtask';
+import {Task, Image} from '../../model/types';
 import TaskComponent from '../../components/task/Task';
 import {SwipeController} from '../../components/swipe/SwipeController'
+import {Tasks} from "../../model/services/tasks";
+import {Swipeable} from "../../components/swipe/Swipeable";
+import {put} from "../../infrastructure/http"
 
 
 const createTaskUrl = 'http://172.24.59.212:8123/tasks/tasks';
-
-const cameraOptions = {
-    destinationType: 0,
-    targetWidth: 640,
-    targetHeight: 480
-};
-
-class Task {
-    constructor(public title = '', public images: Image[] = []) {}
-
-    public addImage(img: Image) {
-        this.images = this.images.concat([img]);
-    }
-
-    public deleteImage(img: Image) {
-        this.images = this.images.filter(_ => _ != img);
-    }
-
-    public getFrontImage() {
-        return this.images[0];
-    }
-
-    public isValid() {
-        return !!this.title && this.images.length > 0 && this.images.every(_ => !!_.description);
-    }
-}
-
-class Image {
-    constructor(public src:string, public description = '') {
-    }
-
-    public toResourceUrl() {
-        return 'data:image/jpeg;base64,' + this.src;
-    }
-}
 
 function taskToFormData(task: Task) {
     var formData = new FormData();
@@ -64,23 +32,6 @@ function taskToFormData(task: Task) {
     }
 }
 
-function put(url: string, formData: FormData): Promise<void> {
-    return new Promise((resolve, reject) => {
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    resolve(JSON.parse(xhr.response));
-                } else {
-                    reject(xhr.response);
-                }
-            }
-        };
-        xhr.open("PUT", url, true);
-        xhr.send(formData);
-    });
-}
-
 function waitWhile<T>(nav: NavController, p: Promise<T>): Promise<T> {
     let loading = Loading.create({content: "Wird übertragen"});
     nav.present(loading);
@@ -90,21 +41,18 @@ function waitWhile<T>(nav: NavController, p: Promise<T>): Promise<T> {
 
 @Page({
     templateUrl: 'build/pages/taskacquisition/taskacquisition.html',
-    directives: [TaskComponent]
+    directives: [TaskComponent, Swipeable]
 })
 export class TaskAcquisitionPage {
 
-    public task:Task;
-    public savedTasks: Task[] = [];
-
     private targetsOpen = false;
     private swipeTargets = [
+        //{ name: 'Mülleimer', onSwiped: task => this.deleteTask(task) },
         { name: 'Kummerkasten', onSwiped: task => this.submitTask(task) },
-        { name: 'Mülleimer', onSwiped: task => this.deleteTask(task) },
     ];
 
-    constructor(public nav: NavController, private swipeCtrl: SwipeController) {
-        this.newTask();
+    constructor(public nav: NavController, private swipeCtrl: SwipeController, public tasks: Tasks) {
+        console.log('task acquisition constructor');
     }
 
     public toggleSwipeAvailability() {
@@ -115,27 +63,16 @@ export class TaskAcquisitionPage {
             this.swipeTargets.forEach(_ => this.swipeCtrl.removeTarget(_));
     }
 
-    public newTask() {
-        this.task = new Task();
+    public getTasks() {
+        return this.tasks.getTasks();
     }
 
-    public saveTask() {
-        if (!this.task.isValid()) {
-            let alert = Alert.create({
-                title: 'Ungültige Eingabe',
-                subTitle: 'Bitte vergeben Sie eine Gesamtbeschreibung und erstellen Sie wenigstens ein Bild mit Beschreibung',
-                buttons: ['OK']
-            });
-            this.nav.present(alert);
-        }
-        else {
-            this.savedTasks.push(this.task);
-            this.newTask();
-        }
+    public createTask() {
+        this.nav.push(CreateTaskPage, { });
     }
 
     public deleteTask(task: Task): Promise<void> {
-        this.savedTasks = this.savedTasks.filter(_ => _ != task);
+        this.tasks.removeTask(task);
         return Promise.resolve();
     }
 
@@ -149,20 +86,8 @@ export class TaskAcquisitionPage {
                 });
                 this.nav.present(alert);
             })
-            .catch(() => { })
-            .then(() => this.deleteTask(task));
-    }
-
-    public deleteImage(img: Image) {
-        this.task.deleteImage(img);
-    }
-
-    public pickImage() {
-        Camera.getPicture(cameraOptions)
-            .then(imageData => {
-                let base64Image = imageData;
-                this.task.addImage(new Image(base64Image));
+            .catch(() => {
             })
-            .catch(() => this.task.addImage(new Image('iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==')));
+            .then(() => this.deleteTask(task));
     }
 }

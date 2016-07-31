@@ -1,0 +1,37 @@
+<ion-navbar *navbar [hideBackButton]="true">
+    <ion-title>Störung erfassen</ion-title>
+
+    <ion-buttons end>
+        <button primary (click)="save()">
+            <ion-icon name='checkmark'></ion-icon>
+        </button>
+
+        <button danger (click)="cancel()">
+            <ion-icon name='close'></ion-icon>
+        </button>
+    </ion-buttons>
+</ion-navbar>
+
+<ion-content padding>
+    <ion-list>
+
+        <ion-item>
+            <ion-label floating>Gesamtbeschreibung</ion-label>
+            <ion-input type="text" [(ngModel)]="task.title" autofocus></ion-input>
+        </ion-item>
+
+        <ion-item *ngFor="#image of task.images">
+            <ion-thumbnail item-left>
+                <img [src]="image.toResourceUrl()">
+            </ion-thumbnail>
+            <ion-label floating>Bildbeschreibung (optional)</ion-label>
+            <ion-input type="text" [(ngModel)]="image.description" autofocus></ion-input>
+            <button danger item-right clear (click)="deleteImage(image)">
+                <ion-icon name='trash'></ion-icon>
+            </button>
+        </ion-item>
+    </ion-list>
+
+    <button fab fab-right (click)="pickImage()"><ion-icon name="camera"></ion-icon></button>
+
+</ion-content>
