@@ -63,7 +63,9 @@ class SwipeGesture {
             return;
 
         let ele = this.ele;
+        let clonedEle;
         let mc = this._hammer = new Hammer.Manager(ele);
+
 
         let ani = this._ani = new Animation(ele);
         ani.duration(0);
@@ -90,10 +92,20 @@ class SwipeGesture {
         });
 
         mc.on('panstart', e => {
-            ani = new Animation(ele);
+            clonedEle = ele.cloneNode(true);
+            clonedEle.style.position = "absolute";
+            clonedEle.style.left = ele.getBoundingClientRect().left + "px";
+            clonedEle.style.top = ele.getBoundingClientRect().top + "px";
+            clonedEle.style.width = ele.getBoundingClientRect().width + "px";
+            clonedEle.style.height = ele.getBoundingClientRect().height + "px";
+            clonedEle.style.zIndex = "9999999";
+            document.body.appendChild(clonedEle);
+
+            ani = new Animation(clonedEle);
             ani
                 .fromTo('translateX', lastX + 'px', e.deltaX + 'px')
                 .fromTo('translateY', lastY + 'px', e.deltaY + 'px')
+                .fromTo('translateZ', '0px', '20px')
                 .fromTo('perspective', '600px', '600px')
                 .fromTo('rotateX', '0', '20deg')
                 .duration(200)
@@ -101,16 +113,23 @@ class SwipeGesture {
 
             lastX = e.deltaX;
             lastY = e.deltaY;
+
+            ele.style.visibility = 'hidden';
         });
 
         mc.on('panend', e => {
             if (swiped)
                 return;
+
             ani
-                .duration(100)
+                .duration(200)
                 .fromTo('translateX', lastX + 'px', '0px')
                 .fromTo('translateY', lastY + 'px', '0px')
-                .fromTo('rotateX', '45deg', '0')
+                .fromTo('rotateX', '20deg', '0')
+                .onFinish(() => {
+                    clonedEle.remove();
+                    ele.style.visibility = 'visible';
+                })
                 .play();
 
             lastX = 0;
