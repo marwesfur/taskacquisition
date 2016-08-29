@@ -21,7 +21,7 @@ export class SwipeController {
     }
 
     public removeTarget(target) {
-        const newTargets = this._targetsInfo.targets.filter(_ => _ != target);
+        const newTargets = this._targetsInfo.targets.filter(_ => _.name != target.name);
         this.setNewTargets(newTargets);
     }
 

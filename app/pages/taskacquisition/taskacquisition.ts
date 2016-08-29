@@ -13,12 +13,6 @@ import {Subscription} from "rxjs/Subscription"
 
 const unknownLocation = 'unknown';
 
-const swipeTargets = [
-    //{ name: 'Mülleimer', onSwiped: task => this.deleteTask(task) },
-    { name: 'Kummerkasten', onSwiped: task => this.submitTask(task) },
-];
-
-
 
 @Page({
     templateUrl: 'build/pages/taskacquisition/taskacquisition.html',
@@ -27,6 +21,12 @@ const swipeTargets = [
 export class TaskAcquisitionPage implements OnInit, OnDestroy {
     private targetsOpen = false;
     private subscription: Subscription = null;
+
+    private swipeTargets = [
+        //{ name: 'Mülleimer', onSwiped: task => this.deleteTask(task) },
+        { name: 'Kummerkasten', onSwiped: task => this.submitTask(task) },
+    ];
+
 
     constructor(public nav: NavController, private swipeCtrl: SwipeController, public tasks: Tasks, private localization: Localization) {
 
@@ -80,9 +80,9 @@ export class TaskAcquisitionPage implements OnInit, OnDestroy {
     }
 
     private onTargetsOpenChanged() {
-        swipeTargets.forEach(_ => this.swipeCtrl.removeTarget(_));
+        this.swipeTargets.forEach(_ => this.swipeCtrl.removeTarget(_));
         if (this.targetsOpen) {
-            swipeTargets.forEach(_ => this.swipeCtrl.addTarget(_));
+            this.swipeTargets.forEach(_ => this.swipeCtrl.addTarget(_));
         }
     }
 }
